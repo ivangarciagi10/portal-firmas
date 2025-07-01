@@ -625,7 +625,7 @@ export default function GuestSignPage() {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-500"
               value={comentario}
               onChange={e => setComentario(e.target.value)}
-              placeholder="¿Tienes algún comentario sobre el proyecto? (opcional)"
+              placeholder={'¿Tienes algún comentario sobre el proyecto? (opcional)'}
               rows="3"
             />
           </div>
@@ -799,7 +799,7 @@ export default function GuestSignPage() {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-500"
               value={comentario}
               onChange={e => setComentario(e.target.value)}
-              placeholder="¿Tienes algún comentario sobre el proyecto? (opcional)"
+              placeholder={'¿Tienes algún comentario sobre el proyecto? (opcional)'}
               rows="3"
             />
           </div>
@@ -849,7 +849,7 @@ export default function GuestSignPage() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                 value={comentario}
                 onChange={e => setComentario(e.target.value)}
-                placeholder="¿Tienes algún comentario adicional? (opcional)"
+                placeholder={'¿Tienes algún comentario adicional? (opcional)'}
                 rows="3"
               />
             </div>

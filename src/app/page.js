@@ -258,7 +258,7 @@ export default function DashboardPage() {
                           </div>
                           {(sig.comentario || sig.feedback) && (
                             <p className="text-gray-700 text-sm italic">
-                              "{sig.comentario || sig.feedback}"
+                              &quot;{sig.comentario || sig.feedback}&quot;
                             </p>
                           )}
                           <div className="text-xs text-gray-500 mt-2">
