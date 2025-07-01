@@ -112,16 +112,16 @@ export default function ProjectDetailPage() {
                   {sig.token ? (
                     <div className="flex items-center gap-2 justify-center">
                       <a
-                        href={`/sign/${sig.token}`}
+                        href={`${process.env.NEXT_PUBLIC_BASE_URL || window.location.origin}/sign/${sig.token}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 underline text-xs break-all"
                       >
-                        /sign/{sig.token}
+                        {process.env.NEXT_PUBLIC_BASE_URL || window.location.origin}/sign/{sig.token}
                       </a>
                       <button
                         className={`px-2 py-1 rounded text-xs font-semibold ${copied === sig.id ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-                        onClick={() => handleCopy(`${window.location.origin}/sign/${sig.token}`, sig.id)}
+                        onClick={() => handleCopy(`${process.env.NEXT_PUBLIC_BASE_URL || window.location.origin}/sign/${sig.token}`, sig.id)}
                       >
                         {copied === sig.id ? '¡Copiado!' : 'Copiar'}
                       </button>
