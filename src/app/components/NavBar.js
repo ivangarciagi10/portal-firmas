@@ -13,8 +13,8 @@ export default function NavBar() {
           <Image src="/logo-gi.png" alt="Generando Ideas" width={160} height={40} priority className="h-10 w-auto" />
           {session && (
             <>
-              <a href="/" className="text-secondary hover:text-primary transition text-lg font-semibold hidden md:inline">Dashboard</a>
-              <a href="/projects" className="text-secondary hover:text-primary transition text-lg font-semibold hidden md:inline">Proyectos</a>
+              <Link href="/" className="text-secondary hover:text-primary transition text-lg font-semibold hidden md:inline">Dashboard</Link>
+              <Link href="/projects" className="text-secondary hover:text-primary transition text-lg font-semibold hidden md:inline">Proyectos</Link>
             </>
           )}
         </div>
