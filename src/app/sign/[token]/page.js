@@ -139,7 +139,8 @@ export default function GuestSignPage() {
   // Generar QR Code
   useEffect(() => {
     if (token) {
-      const mobileUrl = `${window.location.origin}/sign/${token}?mobile=true`;
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
+      const mobileUrl = `${baseUrl}/sign/${token}?mobile=true`;
       QRCode.toDataURL(mobileUrl, {
         width: 200,
         margin: 2,
