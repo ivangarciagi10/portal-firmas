@@ -26,10 +26,14 @@ export default function DashboardPage() {
     if (status === "unauthenticated") {
       router.push("/login");
     }
-  }, [status, router]);
+    // Redirigir a clientes a /projects
+    if (status === "authenticated" && session?.user?.role === "CLIENT") {
+      router.replace("/projects");
+    }
+  }, [status, router, session]);
 
   useEffect(() => {
-    if (status === "authenticated") {
+    if (status === "authenticated" && session?.user?.role !== "CLIENT") {
       fetch("/api/projects")
         .then(res => res.json())
         .then(data => {
@@ -58,10 +62,10 @@ export default function DashboardPage() {
           setProjects(data);
         });
     }
-  }, [status]);
+  }, [status, session]);
 
   if (status === "loading") return <div className="p-8">Cargando...</div>;
-  if (!session) return null;
+  if (!session || session.user.role === "CLIENT") return null;
   const { user } = session;
 
   return (

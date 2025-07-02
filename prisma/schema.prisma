@@ -21,6 +21,8 @@ model User {
   role      Role     @default(CLIENT)
   projects  Project[] @relation("ProjectOwner")
   signatures Signature[]
+  empresa   String?  // Nueva: empresa/compañía
+  puesto    String?  // Nueva: puesto/cargo
   // NextAuth
   accounts  Account[]
   sessions  Session[]
@@ -43,8 +45,8 @@ model Project {
   realEndDate       DateTime?
   scopeObjectives   String
   comments          String?
-  owner             User      @relation("ProjectOwner", fields: [ownerId], references: [id])
-  ownerId           String
+  owner             User?      @relation("ProjectOwner", fields: [ownerId], references: [id])
+  ownerId           String?
   signatures        Signature[]
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt

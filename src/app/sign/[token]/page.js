@@ -109,6 +109,8 @@ export default function GuestSignPage() {
     }
   ];
 
+  const desktopFormRef = useRef(null);
+
   // Detectar si es dispositivo móvil y si viene del QR
   useEffect(() => {
     const checkMobile = () => {
@@ -452,7 +454,14 @@ export default function GuestSignPage() {
               <h3 className="text-lg font-semibold text-blue-800 mb-4">Firma desde tu computadora</h3>
               <p className="text-blue-700 mb-4">Usa tu mouse para dibujar tu firma directamente en la pantalla.</p>
               <button
-                onClick={() => setShowDesktopForm(true)}
+                onClick={() => {
+                  setShowDesktopForm(true);
+                  setTimeout(() => {
+                    if (desktopFormRef.current) {
+                      desktopFormRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }, 100);
+                }}
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg"
               >
                 Firmar con Mouse
@@ -489,7 +498,7 @@ export default function GuestSignPage() {
 
       {/* Formulario de firma para desktop */}
       {!signature.signedAt && !signed && !rejected && signature.estado !== 'REJECTED' && !showSurvey && showDesktopForm && !isMobile && (
-        <form onSubmit={handleSign} className="space-y-6">
+        <form ref={desktopFormRef} onSubmit={handleSign} className="space-y-6">
           {/* Nombre completo */}
           <div>
             <label className="block text-sm font-semibold mb-2 text-gray-700">

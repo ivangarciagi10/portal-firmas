@@ -1,6 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 function EditProjectModal({ open, onClose, project, onSave }) {
@@ -38,7 +38,19 @@ function EditProjectModal({ open, onClose, project, onSave }) {
           </div>
           <div>
             <label className="block text-sm font-semibold mb-1 text-gray-700">Tipo de proyecto</label>
-            <input name="type" value={form.type || ""} onChange={handleChange} className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400" required />
+            <select
+              name="type"
+              value={form.type || ""}
+              onChange={handleChange}
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400"
+              required
+            >
+              <option value="">Selecciona un tipo</option>
+              <option value="Página Web">Página Web</option>
+              <option value="Cotizador por API">Cotizador por API</option>
+              <option value="Tienda en Línea">Tienda en Línea</option>
+              <option value="Tienda Fullfilment">Tienda Fullfilment</option>
+            </select>
           </div>
           <div>
             <label className="block text-sm font-semibold mb-1 text-gray-700">Cliente / Empresa</label>
@@ -117,6 +129,12 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const router = useRouter();
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [userQuery, setUserQuery] = useState("");
+  const [userResults, setUserResults] = useState([]);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const userInputRef = useRef();
   const [form, setForm] = useState({
     name: "",
     type: "",
@@ -133,9 +151,7 @@ export default function ProjectsPage() {
     { name: "", email: "", role: "" }
   ]);
   const [filter, setFilter] = useState({ name: "", status: "", date: "" });
-  const router = useRouter();
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   const fetchProjects = () => {
@@ -153,6 +169,84 @@ export default function ProjectsPage() {
       fetchProjects();
     }
   }, [status]);
+
+  // Buscar usuarios para autocompletado
+  useEffect(() => {
+    if (userQuery.length < 2) {
+      setUserResults([]);
+      return;
+    }
+    fetch(`/api/admin/users?q=${encodeURIComponent(userQuery)}`)
+      .then(res => res.json())
+      .then(data => setUserResults(data));
+  }, [userQuery]);
+
+  if (status === "loading") return <div className="p-8">Cargando...</div>;
+  if (!session) return null;
+
+  // Si es cliente, solo mostrar sus proyectos y firmas
+  if (session.user.role === "CLIENT") {
+    return (
+      <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg">
+        <h1 className="text-2xl font-bold mb-6 text-gray-800">Mis Proyectos</h1>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white rounded-xl shadow border border-gray-100">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="py-2 px-4 text-left">Nombre</th>
+                <th className="py-2 px-4 text-left">Cliente</th>
+                <th className="py-2 px-4 text-left">Estado</th>
+                <th className="py-2 px-4 text-left">Firmas</th>
+                <th className="py-2 px-4 text-left">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr><td colSpan={5} className="py-4 text-center text-gray-400">Cargando...</td></tr>
+              ) : projects.length === 0 ? (
+                <tr><td colSpan={5} className="py-4 text-center text-gray-400">Sin proyectos asignados</td></tr>
+              ) : (
+                projects.map(project => (
+                  <tr key={project.id}>
+                    <td className="py-2 px-4 font-semibold">{project.name}</td>
+                    <td className="py-2 px-4">{project.clientCompany}</td>
+                    <td className="py-2 px-4">
+                      {project.signatures && project.signatures.length > 0 && project.signatures.every(sig => sig.signedAt) ? (
+                        <span className="inline-block px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-semibold">Firmado</span>
+                      ) : (
+                        <span className="inline-block px-2 py-1 rounded bg-yellow-100 text-yellow-700 text-xs font-semibold">Pendiente de firma</span>
+                      )}
+                    </td>
+                    <td className="py-2 px-4">
+                      <div className="flex flex-col gap-1">
+                        {project.signatures.map(sig => (
+                          <div key={sig.id} className="text-xs">
+                            <span className="font-medium">{sig.name}:</span> {sig.signedAt ? (
+                              <span className="text-green-700">Firmado</span>
+                            ) : (
+                              <span className="text-yellow-700">Pendiente</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="py-2 px-4">
+                      <button
+                        onClick={() => router.push(`/projects/${project.id}`)}
+                        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm font-semibold shadow"
+                      >
+                        Ver detalle
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -175,10 +269,12 @@ export default function ProjectsPage() {
   const handleSubmit = async e => {
     e.preventDefault();
     setError("");
+    let ownerIdToSend = form.ownerId;
+    if (ownerIdToSend === "") ownerIdToSend = null;
     const res = await fetch("/api/projects", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, ownerId: session.user.id, signatures }),
+      body: JSON.stringify({ ...form, ownerId: ownerIdToSend, signatures }),
     });
     if (res.ok) {
       setForm({
@@ -191,7 +287,7 @@ export default function ProjectsPage() {
         realEndDate: "",
         scopeObjectives: "",
         comments: "",
-        ownerId: session.user.id,
+        ownerId: "",
       });
       setSignatures([{ name: "", email: "", role: "" }]);
       setShowCreateForm(false);
@@ -256,8 +352,34 @@ export default function ProjectsPage() {
     }
   };
 
-  if (status === "loading" || loading) return <div className="p-8">Cargando proyectos...</div>;
-  if (!session) return null;
+  // Al seleccionar usuario clave
+  const handleUserSelect = user => {
+    setForm(f => ({
+      ...f,
+      keyUser: user.name,
+      clientCompany: user.empresa || f.clientCompany,
+      ownerId: user.id
+    }));
+    setSignatures(sigs => [
+      {
+        name: user.name,
+        email: user.email,
+        role: user.puesto || "Usuario clave"
+      },
+      ...sigs.filter(sig => sig.email !== user.email)
+    ]);
+    setUserQuery(user.name + (user.email ? ` (${user.email})` : ""));
+    setShowUserDropdown(false);
+  };
+
+  const handleUserInput = e => {
+    setUserQuery(e.target.value);
+    setShowUserDropdown(true);
+  };
+
+  const handleUserBlur = () => {
+    setTimeout(() => setShowUserDropdown(false), 200);
+  };
 
   return (
     <div className="w-[90%] mx-auto mt-10 p-8 bg-white rounded-xl shadow-lg">
@@ -307,7 +429,19 @@ export default function ProjectsPage() {
           </div>
           <div>
             <label className="block text-sm font-semibold mb-1 text-gray-700">Tipo de proyecto</label>
-            <input name="type" value={form.type} onChange={handleChange} placeholder="Ej: Página Web" className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400" required />
+            <select
+              name="type"
+              value={form.type}
+              onChange={handleChange}
+              className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400"
+              required
+            >
+              <option value="">Selecciona un tipo</option>
+              <option value="Página Web">Página Web</option>
+              <option value="Cotizador por API">Cotizador por API</option>
+              <option value="Tienda en Línea">Tienda en Línea</option>
+              <option value="Tienda Fullfilment">Tienda Fullfilment</option>
+            </select>
           </div>
           <div>
             <label className="block text-sm font-semibold mb-1 text-gray-700">Cliente / Empresa</label>
@@ -315,7 +449,34 @@ export default function ProjectsPage() {
           </div>
           <div>
             <label className="block text-sm font-semibold mb-1 text-gray-700">Usuario clave (responsable de validación)</label>
-            <input name="keyUser" value={form.keyUser} onChange={handleChange} placeholder="Ej: Renato Ríos" className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400" required />
+            <div className="relative">
+              <input
+                ref={userInputRef}
+                type="text"
+                name="keyUser"
+                value={userQuery || form.keyUser}
+                onChange={handleUserInput}
+                onFocus={() => setShowUserDropdown(true)}
+                onBlur={handleUserBlur}
+                className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-400"
+                placeholder="Buscar por nombre o correo..."
+                autoComplete="off"
+                required
+              />
+              {showUserDropdown && userResults.length > 0 && (
+                <div className="absolute bg-white border rounded shadow w-full z-50 max-h-48 overflow-y-auto">
+                  {[{ id: null, name: "Cliente General", email: "" }, ...userResults.filter(u => u.name !== "Cliente General")].map(user => (
+                    <div
+                      key={user.id}
+                      className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
+                      onMouseDown={() => handleUserSelect(user)}
+                    >
+                      {user.name} <span className="text-xs text-gray-500">{user.email}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <div>
             <label className="block text-sm font-semibold mb-1 text-gray-700">Fecha de inicio</label>
