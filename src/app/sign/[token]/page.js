@@ -469,30 +469,37 @@ export default function GuestSignPage() {
             </div>
           )}
 
-          {/* Opción para móvil */}
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-orange-800 mb-4">Firma desde tu celular</h3>
-            <p className="text-orange-700 mb-4">Escanea el código QR con tu celular para firmar de forma más cómoda.</p>
-            
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              <div className="text-center">
-                {qrCodeUrl && (
-                  <img src={qrCodeUrl} alt="QR Code para firma móvil" className="mx-auto border-2 border-gray-300 rounded-lg" />
-                )}
-                <p className="text-sm text-gray-600 mt-2">Escanea con tu cámara</p>
-              </div>
-              
-              <div className="flex-1">
-                <h4 className="font-semibold text-gray-800 mb-2">Ventajas de firmar en móvil:</h4>
-                <ul className="text-sm text-gray-700 space-y-1">
-                  <li>• Firma más natural con el dedo</li>
-                  <li>• Interfaz optimizada para pantalla táctil</li>
-                  <li>• Proceso más rápido y cómodo</li>
-                  <li>• Mejor precisión al firmar</li>
-                </ul>
+          {/* Opción para móvil: mostrar QR solo en desktop, en móvil mostrar formulario directo */}
+          {!isMobile && (
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-orange-800 mb-4">Firma desde tu celular</h3>
+              <p className="text-orange-700 mb-4">Escanea el código QR con tu celular para firmar de forma más cómoda.</p>
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="text-center">
+                  {qrCodeUrl && (
+                    <img src={qrCodeUrl} alt="QR Code para firma móvil" className="mx-auto border-2 border-gray-300 rounded-lg" />
+                  )}
+                  <p className="text-sm text-gray-600 mt-2">Escanea con tu cámara</p>
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-800 mb-2">Ventajas de firmar en móvil:</h4>
+                  <ul className="text-sm text-gray-700 space-y-1">
+                    <li>• Firma más natural con el dedo</li>
+                    <li>• Interfaz optimizada para pantalla táctil</li>
+                    <li>• Proceso más rápido y cómodo</li>
+                    <li>• Mejor precisión al firmar</li>
+                  </ul>
+                </div>
               </div>
             </div>
-          </div>
+          )}
+          {/* En móvil, mostrar el formulario de firma directamente */}
+          {isMobile && (
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-orange-800 mb-4">Firma desde tu celular</h3>
+              <p className="text-orange-700 mb-4">Utiliza tu dedo para firmar directamente en la pantalla.</p>
+            </div>
+          )}
         </div>
       )}
 
