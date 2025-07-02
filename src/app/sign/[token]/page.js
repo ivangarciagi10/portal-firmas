@@ -406,26 +406,30 @@ export default function GuestSignPage() {
   if (!signature) return null;
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-xl shadow-lg">
+    <div className="max-w-2xl mx-auto mt-10 p-4 sm:p-8 bg-white rounded-xl shadow-lg">
+      {/* Título del proyecto */}
+      {signature?.projectName && (
+        <div className="text-center mb-4">
+          <h2 className="text-2xl font-bold text-orange-700">{signature.projectName}</h2>
+        </div>
+      )}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Firma Digital de Documento</h1>
         <p className="text-gray-600">Proceso oficial de firma electrónica</p>
       </div>
 
       {/* Información del documento */}
-      <div className="bg-gray-50 p-6 rounded-lg mb-8">
+      <div className={`rounded-lg mb-8 ${isMobile ? 'bg-white border border-gray-200 p-4' : 'bg-gray-50 p-6'}`}> 
         <h2 className="text-xl font-semibold mb-4 text-gray-800">Información del Documento</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <p className="mb-2"><span className="font-semibold text-gray-700">Firmante:</span> {signature.name}</p>
-            <p className="mb-2"><span className="font-semibold text-gray-700">Rol:</span> {signature.role}</p>
-            <p className="mb-2"><span className="font-semibold text-gray-700">Email:</span> {signature.email || '-'}</p>
+            <p className="mb-2"><span className="font-semibold text-gray-800">Firmante:</span> <span className="text-gray-900">{signature.name}</span></p>
+            <p className="mb-2"><span className="font-semibold text-gray-800">Rol:</span> <span className="text-gray-900">{signature.role}</span></p>
+            <p className="mb-2"><span className="font-semibold text-gray-800">Email:</span> <span className="text-gray-900">{signature.email || '-'}</span></p>
           </div>
           <div>
-            <p className="mb-2"><span className="font-semibold text-gray-700">Estado:</span> 
-              {signature.estado === 'REJECTED' ? 'Rechazado' : signature.signedAt ? `Firmado el ${signature.signedAt.slice(0,10)}` : 'Pendiente'}
-            </p>
-            <p className="mb-2"><span className="font-semibold text-gray-700">Fecha:</span> {new Date().toLocaleDateString('es-ES')}</p>
+            <p className="mb-2"><span className="font-semibold text-gray-800">Estado:</span> <span className="text-gray-900">{signature.estado === 'REJECTED' ? 'Rechazado' : signature.signedAt ? `Firmado el ${signature.signedAt.slice(0,10)}` : 'Pendiente'}</span></p>
+            <p className="mb-2"><span className="font-semibold text-gray-800">Fecha:</span> <span className="text-gray-900">{new Date().toLocaleDateString('es-ES')}</span></p>
           </div>
         </div>
       </div>
