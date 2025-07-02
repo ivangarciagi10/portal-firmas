@@ -667,7 +667,7 @@ export default function GuestSignPage() {
       )}
 
       {/* Formulario de firma para móvil */}
-      {!signature.signedAt && !signed && !rejected && signature.estado !== 'REJECTED' && !showSurvey && showDesktopForm && isMobile && (
+      {!signature?.signedAt && !signed && !rejected && signature?.estado !== 'REJECTED' && !showSurvey && isMobile && (
         <form onSubmit={handleSign} className="space-y-6">
           <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
             <div className="flex items-center gap-2 text-orange-800">
