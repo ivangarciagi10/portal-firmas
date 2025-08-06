@@ -60,12 +60,14 @@ export async function PUT(req, { params }) {
       data: {
         name: data.name,
         type: data.type,
-        client: data.client,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        scope: data.scope,
+        clientCompany: data.clientCompany,
+        keyUser: data.keyUser,
+        startDate: data.startDate ? new Date(data.startDate) : undefined,
+        plannedEndDate: data.plannedEndDate ? new Date(data.plannedEndDate) : undefined,
+        realEndDate: data.realEndDate ? new Date(data.realEndDate) : undefined,
+        scopeObjectives: data.scopeObjectives,
         comments: data.comments,
-        // Otros campos editables
+        ownerId: data.ownerId,
         signatures: {
           create: signaturesWithToken
         }
