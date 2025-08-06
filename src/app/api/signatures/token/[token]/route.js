@@ -45,7 +45,7 @@ export async function POST(req, { params }) {
           signedAt: new Date(),
           comentario: body.comentario,
           nombreCompleto: body.nombreCompleto,
-          signatureImage: body.signatureImage,
+          // signatureImage no longer required - simplified review process
           calificacionGeneral: body.calificacionGeneral,
           calidadDesarrollo: body.calidadDesarrollo,
           comunicacion: body.comunicacion,
